@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 
 // Notice Component (unchanged)
 const Notice = ({ fetchNotices }) => {
@@ -53,7 +54,7 @@ const Notice = ({ fetchNotices }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/notices', {
+      const response = await fetch(`${baseURL}/notices`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,7 +220,7 @@ const App = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/notice', {
+      const response = await fetch(`${baseURL}/notice`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -259,7 +260,7 @@ const App = () => {
 
     try {
       // Use selectedNoticeId in the URL to identify which notice to delete
-      const response = await fetch(`http://localhost:5000/notice/${selectedNoticeId}`, {
+      const response = await fetch(`${baseURL}/notice/${selectedNoticeId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

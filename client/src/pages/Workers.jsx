@@ -1,4 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 
 const Workers = () => {
   const [notices, setNotices] = useState([]);
@@ -9,7 +10,7 @@ const Workers = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch('http://localhost:5000/worker');
+      const response = await fetch(`${baseURL}/worker`);
       if (!response.ok) throw new Error('Failed to fetch notices');
       const data = await response.json();
       setNotices(data);
@@ -22,7 +23,7 @@ const Workers = () => {
 
   const trackCallClick = async () => {
     try {
-      await fetch('http://localhost:5000/stats/track-call-click', { method: 'POST' });
+      await fetch(`${baseURL}/stats/track-call-click`, { method: 'POST' });
     } catch (error) {
       console.error('Failed to track call click:', error.message);
     }

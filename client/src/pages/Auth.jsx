@@ -1,7 +1,7 @@
 import { Route, Routes, Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
-
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 
 const Auth = () => {
   const location = useLocation();
@@ -49,7 +49,7 @@ const Login = () => {
     const data = { phone_number: fullPhoneNumber, password };
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${baseURL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -116,7 +116,7 @@ const Register = () => {
     const data = { name, phone_number: fullPhoneNumber, password };
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch(`${baseURL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 
 const LoginAdmin = () => {
   const [login, setlogin] = useState("");
@@ -12,7 +13,7 @@ const LoginAdmin = () => {
     const data = { login, password };
 
     try {
-      const response = await fetch("http://localhost:5000/admin", {
+      const response = await fetch(`${baseURL}/admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

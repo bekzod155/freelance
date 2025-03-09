@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Bar } from 'react-chartjs-2'; // Import Bar component
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; // Import Chart.js components
-
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -56,7 +56,7 @@ const Admin = () => {
             setError(null);
             const token = localStorage.getItem('token');
             
-            let url = endpoint === 'stats' ? 'http://localhost:5000/stats' : `http://localhost:5000/admin/${endpoint}`;
+            let url = endpoint === 'stats' ? `${baseURL}/stats` : `${baseURL}/admin/${endpoint}`;
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -87,7 +87,7 @@ const Admin = () => {
     const handleConfirmNotice = async (noticeId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/admin/notice/${noticeId}/status`, {
+            const response = await fetch(`${baseURL}/admin/notice/${noticeId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const Admin = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/admin/notice/${noticeId}`, {
+            const response = await fetch(`${baseURL}/admin/notice/${noticeId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ const Admin = () => {
         try {
             const token = localStorage.getItem('token');
             const formattedDate = formatDateToDDMMYYYY(new Date(editNotice.date));
-            const response = await fetch(`http://localhost:5000/admin/notice/${editNotice.id}`, {
+            const response = await fetch(`${baseURL}/admin/notice/${editNotice.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ const Admin = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/noticesaddadmin', {
+            const response = await fetch(`${baseURL}/noticesaddadmin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
