@@ -1,6 +1,7 @@
 import React, { useEffect,useRef } from "react";
 import { ReactTyped } from "react-typed";
 const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+console.log(baseURL);
 
 const Home = () => {
   // Add useEffect to make the GET request when the component mounts

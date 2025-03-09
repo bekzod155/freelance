@@ -208,6 +208,8 @@ app.delete('/notice/:id', authenticateToken, async (req, res) => {
 });
 // Get Available Notices (in process) - Public Access
 app.get('/worker', async (req, res) => {
+  console.log('backendd');
+  
   try {
     const db = await connectDB();
     await db.run('UPDATE statistics SET count = count + 1 WHERE stat_key = "worker_visits"');
