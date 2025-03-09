@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 
 const LoginAdmin = () => {
   const [login, setlogin] = useState("");

@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
-const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 
 // Notice Component (unchanged)
 const Notice = ({ fetchNotices }) => {

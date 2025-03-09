@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Bar } from 'react-chartjs-2'; // Import Bar component
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; // Import Chart.js components
-const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 

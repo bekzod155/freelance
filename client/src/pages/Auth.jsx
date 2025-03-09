@@ -1,7 +1,7 @@
 import { Route, Routes, Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
-const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 
 const Auth = () => {
   const location = useLocation();

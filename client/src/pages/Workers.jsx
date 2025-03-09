@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 
 const Workers = () => {
   const [notices, setNotices] = useState([]);
