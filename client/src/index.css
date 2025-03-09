@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+* {
+  font-family: 'Verdana', sans-serif; /* Example using Roboto */
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Ensure full height and remove margins/padding */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+nav {
+  background-color: #021687;
+}
+#btn {
+  background: #021687;
+  color: white;
+}
+
+/* Remove increment and decrement arrows from number input */
+input[type="number"] {
+  appearance: textfield; /* Standard */
+  -webkit-appearance: textfield; /* Chrome, Safari */
+  -moz-appearance: textfield; /* Firefox */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Main container for the app */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
+}
+
+/* Ensure the main content takes up available space but doesn’t overlap the footer */
+.main-content {
+  flex: 1; /* Takes up available space */
+  padding-bottom: 60px;
+ /* Add padding to prevent content from being hidden under the fixed footer */
+}
+
+/* Fix the footer at the bottom of the viewport */
+footer {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #021687; /* Match your bg-dark class or adjust as needed */
+  color: white;
+  z-index: 1000; /* Ensure it stays on top of other content */
+  
+}
+
+/* Ensure the Navbar doesn’t overlap with the footer (optional, adjust as needed) */
+nav.navbar {
+  z-index: 1001; /* Higher than the footer to stay on top */
+}
+#animation {
+  height: 200px;
+}
+
+
+/* auth page */
+
+/* Custom styles to match the screenshot */
+.btn-outline-secondary {
+  background-color: #f0f0f0; /* Light gray for LOGIN button */
+  border-color: #ccc; /* Slightly darker border */
+  color: #333; /* Darker text */
+}
+
+.btn-outline-info {
+  background-color: #e0f0f7; /* Light blue for REGISTER button */
+  border-color: #66b0ff; /* Blue border */
+  color: #007bff; /* Blue text */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Blue for SIGN IN button */
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  border-color: #0056b3;
+}
+
+.form-control {
+  border-radius: 0; /* Remove rounded corners for flat look */
+  border: 1px solid #ccc; /* Light gray border */
+  padding: 0.75rem; /* Slightly larger padding for inputs */
+}
+
+.form-control:focus {
+  border-color: #007bff; /* Blue border on focus */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue focus shadow */
+}
+
+/* Ensure buttons and inputs are centered and spaced */
+/* .container {
+  padding-top: 20px;
+  padding-bottom: 20px;
+} */
+/* #homeCont {
+  background-image: url('../public/Фабрика\ форматовhd\ GIF.gif.gif');
+} */
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .w-100 {
+    max-width: 90%; /* Slightly narrower on mobile */
+  }
+}
+@media (max-width: 1450px) {
+  #homeCont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+
+  }
+  #homeCont b {
+    font-size: 1.2rem;
+  }
+
+
+}
+#cardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+  gap: 15px;
+  justify-content: center;
+}
+#shadow {
+  box-shadow: 0px 4px 10px rgba(7, 110, 255, 0.5); /* Red shadow */
+}
