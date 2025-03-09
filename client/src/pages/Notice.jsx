@@ -164,7 +164,7 @@ const Notice = ({ fetchNotices }) => {
                 </div>
               </div>
               <div className="col-md-6">
-                <label htmlFor="price" className="form-label">Narx</label>
+                <label htmlFor="price" className="form-label">Ish haqi</label>
                 <input
                   type="number"
                   className="form-control"
@@ -337,7 +337,7 @@ const App = () => {
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Telefon:<strong> {notice.phone_number} </strong></span>
-                <span>Narx: <strong> {notice.price} </strong> so'm</span>
+                <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Status: <strong className={getStatusClass(notice.status)}>{getStatusText(notice.status)}</strong></span>

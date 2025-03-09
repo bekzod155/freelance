@@ -231,6 +231,7 @@ app.get('/worker', async (req, res) => {
 });
 // Admin Login
 app.post('/admin', async (req, res) => {
+  
   const { login, password } = req.body;
   if (!login || !password) {
     return res.status(400).json({ error: 'Login and password are required' });
@@ -450,6 +451,7 @@ app.post('/noticesaddadmin', adminauthenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to post notice', details: error.message });
   }
 });
+
 
 // Serve React Build (New Code Added Here)
 // Set the path to the React build folder (adjust path as needed based on your project structure)

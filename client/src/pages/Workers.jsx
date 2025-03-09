@@ -87,7 +87,7 @@ const Workers = () => {
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Ish tugash vaqti: <strong> {new Date(notice.date).toLocaleDateString("en-GB")} </strong> </span>
-                <span>Narx: <strong> {notice.price} </strong> so'm</span>
+                <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>

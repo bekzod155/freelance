@@ -263,13 +263,13 @@ const Admin = () => {
     // Bar chart data and options
     const chartData = {
         labels: [
-            'Umumiy tashriflar',
-            'Ish qidiruvchilar',
-            'Qoʻngʻiroq qilganlar',
-            'Ish beruvchilar',
-            'Umumiy eʼlonlar',
-            'Admin eʼlonlari',
-            'Ish beruvchi eʻlonlari',
+            `Umumiy tashriflar: ${data?.home_visits || 0}`,
+            `Ish qidiruvchilar: ${data?.worker_visits || 0}`,
+            `Qoʻngʻiroq qilganlar: ${data?.call_button_clicks || 0}`,
+            `Ish beruvchilar: ${data?.user_count || 0}`,
+            `Umumiy eʼlonlar: ${data?.notice_count || 0}`,
+            `Admin eʼlonlari: ${data?.admin_notices || 0}`,
+            `Ish beruvchi eʻlonlari: ${data?.userNoticeCount || 0}`,
         ],
         datasets: [{
             label: 'Statistics',
@@ -376,7 +376,7 @@ const Admin = () => {
                                         <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>
                                     </div>
                                     <div className="d-flex card-footer justify-content-between">
-                                        <span>Narx: <strong> {notice.price} </strong> so'm</span>
+                                        <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
                                         <a href={`tel:${notice.phone_number}`} className="text-decoration-none">Telefon:<strong> {notice.phone_number} </strong></a>
                                     </div>
                                     <div className="d-flex card-footer justify-content-between">
@@ -433,7 +433,7 @@ const Admin = () => {
                                         <input type="text" className="form-control" id="phone_number" name="phone_number" value={editNotice.phone_number} onChange={handleInputChange} required />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="price" className="form-label">Narx (so'm)</label>
+                                        <label htmlFor="price" className="form-label">Ish haqi (so'm)</label>
                                         <input type="number" className="form-control" id="price" name="price" value={editNotice.price} onChange={handleInputChange} required />
                                     </div>
                                 </form>
@@ -523,7 +523,7 @@ const Admin = () => {
                                 </div>
                             </div>
                             <div className="col-md-6">
-                                <label htmlFor="price" className="form-label">Narx</label>
+                                <label htmlFor="price" className="form-label">Ish haqi</label>
                                 <input
                                     type="number"
                                     className="form-control"
