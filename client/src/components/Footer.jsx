@@ -3,7 +3,7 @@ import React from "react";
 const Footer = () => {
   return (
     <footer >
-      <div className="container">
+      <div className="footer">
         <div className="row justify-content-between">
           <div className="col-12 col-md-3">
             <br />

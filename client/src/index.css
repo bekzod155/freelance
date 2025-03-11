@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 * {
-  font-family: 'Verdana', sans-serif; /* Example using Roboto */
+  font-family: 'Verdana', sans-serif; /* Example using Verdana */
 }
 
 body {
@@ -8,15 +8,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 /* Ensure full height and remove margins/padding */
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
 }
+
 nav {
   background-color: #021687;
 }
+
 #btn {
   background: #021687;
   color: white;
@@ -39,39 +42,68 @@ input[type="number"]::-webkit-inner-spin-button {
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; 
+  min-height: 100vh; /* Ensures it takes at least full viewport height */
 }
 
-/* Ensure the main content takes up available space but doesn’t overlap the footer */
-.main-content {
-  flex: 1; /* Takes up available space */
-  padding-bottom: 60px;
- /* Add padding to prevent content from being hidden under the fixed footer */
-}
+/* Ensure the main content takes up available space */
 
-/* Fix the footer at the bottom of the viewport */
+
+/* Footer stays at the bottom */
 footer {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #021687; /* Match your bg-dark class or adjust as needed */
+  padding: 10px;
+  flex-shrink: 0; /* Prevents footer from shrinking */
+  background-color: #021687;
   color: white;
-  z-index: 1000; /* Ensure it stays on top of other content */
-  
+  width: 100%;
 }
 
-/* Ensure the Navbar doesn’t overlap with the footer (optional, adjust as needed) */
+/* Ensure the Navbar doesn’t overlap with other content */
 nav.navbar {
-  z-index: 1001; /* Higher than the footer to stay on top */
+  z-index: 1001; /* Higher than other elements if needed */
 }
+
+/* Update the existing #animation class */
 #animation {
-  height: 200px;
+  height: auto; /* Change from fixed 250px to auto */
+  min-height: 250px; /* Set minimum height instead */
+  max-height: 400px; /* Optional: set a maximum height */
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  box-shadow: 1px 1px 13px 5px rgba(0,0,0,0.42);
+  padding: 15px; /* Increased padding for better spacing */
+  overflow-y: auto; /* Add scrolling if content exceeds max-height */
+  margin: 0 10px; /* Add some margin on smaller screens */
 }
 
+/* Make the text responsive */
+.tex {
+  font-family: Georgia, serif;
+  color: #000000;
+  font-weight: 900;
+  font-size: 1.8rem; /* Slightly smaller base font size */
+  text-shadow: 0 0 1px #0010f5;
+  display: block; /* Ensure it takes full width */
+  word-wrap: break-word; /* Ensure words break properly */
+}
 
-/* auth page */
+/* Add media queries for different screen sizes */
+@media (max-width: 768px) {
+  .tex {
+    font-size: 1.2rem; /* Smaller font on tablets */
+  }
+}
 
-/* Custom styles to match the screenshot */
+@media (max-width: 568px) {
+  .tex {
+    font-size: 1rem; /* Even smaller font on phones */
+  }
+  
+  #animation {
+    min-height: 200px; /* Slightly smaller minimum height */
+    margin: 0 5px; /* Less margin on very small screens */
+  }
+}
+/* Auth page styles */
 .btn-outline-secondary {
   background-color: #f0f0f0; /* Light gray for LOGIN button */
   border-color: #ccc; /* Slightly darker border */
@@ -105,31 +137,25 @@ nav.navbar {
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue focus shadow */
 }
 
-/* Ensure buttons and inputs are centered and spaced */
-/* .container {
-  padding-top: 20px;
-  padding-bottom: 20px;
-} */
-/* #homeCont {
-  background-image: url('../public/Фабрика\ форматовhd\ GIF.gif.gif');
-} */
-/* Responsive adjustments */
-@media (max-width: 767.98px) {
-  .w-100 {
-    max-width: 90%; /* Slightly narrower on mobile */
-  }
+
+#homeCont {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
-@media (max-width: 1450px) {
-  #homeCont {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
+/* #homeCont {
+  position: relative;
+  z-index: 1;
+}
+#homeCont > * {
+  position: relative;
+  z-index: 2;
+} */
 
-  }
-
-
-
+.main-content{
+  position: relative
 }
 #cardContainer {
   display: grid;
@@ -137,6 +163,35 @@ nav.navbar {
   gap: 15px;
   justify-content: center;
 }
+
 #shadow {
-  box-shadow: 0px 4px 10px rgba(7, 110, 255, 0.5); /* Red shadow */
+  box-shadow: 0px 4px 10px rgba(7, 110, 255, 0.5); /* Blue shadow */
+}
+img {
+  width: 100px;
+  height: 100px;
+}
+/* Responsive adjustments */
+
+
+@media (max-width: 568px) {
+  #homeCont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+  }
+  #cardContainer{
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  img {
+    width: 35px;
+    height: 35px;
+  }
+  #navtext{
+    font-size: 12px;
+  }
+  #navietm{
+    font-size: 8px;
+  }
 }

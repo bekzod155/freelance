@@ -86,18 +86,18 @@ const Workers = () => {
                 <textarea className="form-control" value={notice.description} readOnly rows="3" />
               </div>
               <div className="d-flex card-footer justify-content-between">
-                <span>Ish tugash vaqti: <strong> {new Date(notice.date).toLocaleDateString("en-GB")} </strong> </span>
-                <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
+                <span>Ishning tugash vaqti: <strong> {new Date(notice.date).toLocaleDateString("en-GB")} </strong> </span>
+                <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>               
               </div>
               <div className="d-flex card-footer justify-content-between">
-                <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>
+                <span>Ish haqi: <strong className='text-success'> {notice.price} </strong></span>
                 <a href={`tel:${notice.phone_number}`} className="text-decoration-none">
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm "
                     onClick={trackCallClick}
                   >
                     <i className="bi bi-telephone-fill me-1"></i>
-                    Telefon qilish
+                    <small className=''>Telefon qilish</small>
                   </button>
                 </a>
               </div>

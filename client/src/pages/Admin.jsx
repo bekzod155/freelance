@@ -266,7 +266,7 @@ const Admin = () => {
             `Umumiy tashriflar: ${data?.home_visits || 0}`,
             `Ish qidiruvchilar: ${data?.worker_visits || 0}`,
             `Qoʻngʻiroq qilganlar: ${data?.call_button_clicks || 0}`,
-            `Ish beruvchilar: ${data?.user_count || 0}`,
+            `Ish beruvchilar: ${data?.user_count-1 || 0}`,
             `Umumiy eʼlonlar: ${data?.notice_count || 0}`,
             `Admin eʼlonlari: ${data?.admin_notices || 0}`,
             `Ish beruvchi eʻlonlari: ${data?.userNoticeCount || 0}`,
@@ -277,7 +277,7 @@ const Admin = () => {
                 data?.home_visits || 0,
                 data?.worker_visits || 0,
                 data?.call_button_clicks || 0,
-                data?.user_count || 0,
+                data?.user_count-1 || 0,
                 data?.notice_count || 0,
                 data?.admin_notices || 0,
                 data?.userNoticeCount || 0
@@ -378,17 +378,18 @@ const Admin = () => {
                                     <div className="d-flex card-footer justify-content-between">
                                         <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
                                         <a href={`tel:${notice.phone_number}`} className="text-decoration-none">Telefon:<strong> {notice.phone_number} </strong></a>
+                                        {/* there should be user_phone_number from the notice */}
                                     </div>
                                     <div className="d-flex card-footer justify-content-between">
                                         <button className='btn btn-danger' onClick={() => handleDelete(notice.id)}>
-                                            <i className="bi bi-trash"></i> O'chirish
+                                            <i className="bi bi-trash"></i> <small>O'chirish</small> 
                                         </button>
                                         <button className='btn btn-warning' onClick={() => handleEdit(notice)}>
-                                            <i className="bi bi-pencil"></i> Tahrirlash
+                                            <i className="bi bi-pencil"></i> <small>Tahrirlash</small>  
                                         </button>                            
                                         {activeTab !== 'all' && (
                                             <button className='btn btn-success' onClick={() => handleConfirmNotice(notice.id)}>
-                                                <i className="bi bi-check"></i> Tasdiqlash
+                                                <i className="bi bi-check"></i> <small>Tasdiqlash</small>    
                                             </button>
                                         )}
                                     </div>

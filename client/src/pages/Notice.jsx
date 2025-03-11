@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 import { useNavigate } from 'react-router-dom';
 const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
 
-// Notice Component (unchanged)
+// Notice Component with Toast
 const Notice = ({ fetchNotices }) => {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
     description: '',
     date: '',
     gender: 'all',
-    phone: '',
     price: '',
   });
-  const [message, setMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVariant, setToastVariant] = useState('success');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,11 +39,17 @@ const Notice = ({ fetchNotices }) => {
     }));
   };
 
+  const showToastMessage = (message, variant = 'success') => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     if (!token) {
-      setMessage('Iltimos, avval tizimga kiring');
+      showToastMessage('Iltimos, avval tizimga kiring', 'danger');
       navigate('/auth/login');
       return;
     }
@@ -49,7 +58,6 @@ const Notice = ({ fetchNotices }) => {
       description: formData.description,
       date: formData.date,
       gender: formData.gender,
-      phone_number: formData.phone,
       price: parseFloat(formData.price),
     };
 
@@ -64,21 +72,20 @@ const Notice = ({ fetchNotices }) => {
       });
       const result = await response.json();
       if (response.ok) {
-        setMessage("Eʼlon muvaffaqiyatli joylandi!");
+        showToastMessage("Eʼlon muvaffaqiyatli joylandi!");
         setFormData({
           description: '',
           date: '',
           gender: 'male',
-          phone: '',
           price: '',
         });
         fetchNotices();
         handleClose();
       } else {
-        setMessage(result.error || 'Xatolik yuz berdi');
+        showToastMessage(result.error || 'Xatolik yuz berdi', 'danger');
       }
     } catch (error) {
-      setMessage('Server bilan bogʻlanishda xatolik');
+      showToastMessage('Server bilan bogʻlanishda xatolik', 'danger');
     }
   };
 
@@ -88,24 +95,41 @@ const Notice = ({ fetchNotices }) => {
         E'lon joylash
       </Button>
       
+      <ToastContainer position="top-center" className="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+        <Toast 
+          onClose={() => setShowToast(false)} 
+          show={showToast} 
+          delay={3000} 
+          autohide 
+          bg={toastVariant}
+          text={toastVariant === 'dark' ? 'white' : 'dark'}
+        >
+          <Toast.Header>
+            <strong className="me-auto">Xabar</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+      
       <Modal show={show} onHide={handleClose} size="lg" centered>
         <Modal.Header closeButton>
-          <Modal.Title>E'lon qo‘shish</Modal.Title>
+          <Modal.Title>E'lon qo'shish</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form onSubmit={handleSubmit}>
             <div className="row mb-3">
-              <div className="col-md-6">
-                <label htmlFor="phone" className="form-label">Telefon</label>
+            <div className="col-md-6">
+                <label htmlFor="price" className="form-label">Ish haqi</label>
                 <input
-                  type="tel"
+                  type="number"
+                  placeholder='So`m'
                   className="form-control"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  id="price"
+                  name="price"
+                  value={formData.price}
                   onChange={handleChange}
-                  placeholder="+998901234567"
-                  autoComplete="tel"
+                  min="0"
+                  step="0.01"
                   required
                 />
               </div>
@@ -163,25 +187,13 @@ const Notice = ({ fetchNotices }) => {
                   <label htmlFor="female" className="form-check-label">Ayol</label>
                 </div>
               </div>
-              <div className="col-md-6">
-                <label htmlFor="price" className="form-label">Ish haqi</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  id="price"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
+
             </div>
             <div className="col-md-12">
               <label htmlFor="description" className="form-label">Tavsif</label>
               <textarea
                 className="form-control"
+                placeholder='Ish haqida batafsil ma`lumot (davomiylik,manzil va qo`shimcha raqam...)'
                 id="description"
                 name="description"
                 value={formData.description}
@@ -190,7 +202,6 @@ const Notice = ({ fetchNotices }) => {
               />
             </div>
           </form>
-          {message && <div className="text-center mt-2">{message}</div>}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -209,8 +220,17 @@ const App = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [selectedNoticeId, setSelectedNoticeId] = useState(null); // Stores the ID of the notice to be deleted
+  const [selectedNoticeId, setSelectedNoticeId] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastVariant, setToastVariant] = useState('success');
   const navigate = useNavigate();
+
+  const showToastMessage = (message, variant = 'success') => {
+    setToastMessage(message);
+    setToastVariant(variant);
+    setShowToast(true);
+  };
 
   const fetchNotices = async () => {
     const token = localStorage.getItem('token');
@@ -231,9 +251,11 @@ const App = () => {
         setNotices(data);
       } else {
         console.error('Error fetching notices:', data.error);
+        showToastMessage('E\'lonlarni yuklashda xatolik', 'danger');
       }
     } catch (error) {
       console.error('Server error:', error);
+      showToastMessage('Server bilan bogʻlanishda xatolik', 'danger');
     } finally {
       setLoading(false);
     }
@@ -244,13 +266,11 @@ const App = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When delete button is clicked, store the notice ID and show modal
   const handleDeleteClick = (noticeId) => {
-    setSelectedNoticeId(noticeId); // Set the ID of the notice to be deleted
+    setSelectedNoticeId(noticeId);
     setShowFeedbackModal(true);
   };
 
-  // Handle feedback and delete the notice with the stored ID
   const handleFeedback = async (wasHelpful) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -259,26 +279,27 @@ const App = () => {
     }
 
     try {
-      // Use selectedNoticeId in the URL to identify which notice to delete
       const response = await fetch(`${baseURL}/notice/${selectedNoticeId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ wasHelpful: wasHelpful }) // Send feedback value
+        body: JSON.stringify({ wasHelpful: wasHelpful })
       });
 
       if (response.ok) {
-        // Remove the notice with the matching ID from the state
         setNotices(notices.filter(notice => notice.id !== selectedNoticeId));
         setShowFeedbackModal(false);
-        setSelectedNoticeId(null); // Clear the selected ID
+        setSelectedNoticeId(null);
+        showToastMessage('E\'lon muvaffaqiyatli o\'chirildi');
       } else {
         console.error('Error deleting notice');
+        showToastMessage('E\'lonni o\'chirishda xatolik', 'danger');
       }
     } catch (error) {
       console.error('Server error:', error);
+      showToastMessage('Server bilan bogʻlanishda xatolik', 'danger');
     }
   };
 
@@ -311,6 +332,23 @@ const App = () => {
   return (
     <div className="container mt-2 d-flex flex-column justify-content-center align-items-center">
       <Notice fetchNotices={fetchNotices} />
+      
+      <ToastContainer position="top-end" className="p-3">
+        <Toast 
+          onClose={() => setShowToast(false)} 
+          show={showToast} 
+          delay={3000} 
+          autohide 
+          bg={toastVariant}
+          text={toastVariant === 'dark' ? 'white' : 'dark'}
+        >
+          <Toast.Header>
+            <strong className="me-auto">Xabar</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+      
       {loading ? (
         <p>Loading...</p>
       ) : notices.length === 0 ? (
@@ -337,13 +375,13 @@ const App = () => {
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Telefon:<strong> {notice.phone_number} </strong></span>
-                <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
+                <span>Ish haqi: <strong> {notice.price} </strong> </span>
               </div>
               <div className="d-flex card-footer justify-content-between">
                 <span>Status: <strong className={getStatusClass(notice.status)}>{getStatusText(notice.status)}</strong></span>
                 <button 
                   className='btn btn-danger'
-                  onClick={() => handleDeleteClick(notice.id)} // Pass the notice ID here
+                  onClick={() => handleDeleteClick(notice.id)}
                 >
                   <i className="bi bi-trash"></i> O'chirish
                 </button>
@@ -362,18 +400,18 @@ const App = () => {
           <Modal.Title>Fikr-mulohaza</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Ushbu frilans platformasi sizga yordam berdimi?
+          Ushbu platforma sizga yordam berdimi?
         </Modal.Body>
         <Modal.Footer>
           <Button 
             variant="secondary" 
-            onClick={() => handleFeedback(false)} // Delete with false feedback
+            onClick={() => handleFeedback(false)}
           >
             Yo'q
           </Button>
           <Button 
             variant="primary" 
-            onClick={() => handleFeedback(true)} // Delete with true feedback
+            onClick={() => handleFeedback(true)}
           >
             Ha
           </Button>

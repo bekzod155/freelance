@@ -5,10 +5,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config'; // Add this to load .env
 import path from 'path'; // Add this to handle file paths for serving the React build
+import { log } from 'console';
+import { console } from 'inspector';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET; // Use environment variable
+const JWT_SECRET = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6'; // Use environment variable
 
 // Middleware
 app.use(express.json());
@@ -143,9 +145,9 @@ app.post('/login', async (req, res) => {
 
 // Post Notice
 app.post('/notices', authenticateToken, async (req, res) => {
-  const { description, date, gender, phone_number, price } = req.body;
+  const { description, date, gender, price } = req.body;
   const user_id = req.user.id;
-  if (!description || !date || !gender || !phone_number || !price) {
+  if (!description || !date || !gender || !price) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   if (!['male', 'female', 'all'].includes(gender)) {
@@ -153,10 +155,17 @@ app.post('/notices', authenticateToken, async (req, res) => {
   }
   try {
     const db = await connectDB();
+    // Get the user's phone number from the database
+    const user = await db.get('SELECT phone_number FROM users WHERE id = ?', [user_id]);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
     await db.run(
       'INSERT INTO notices (user_id, description, date, gender, phone_number, price, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [user_id, description, date, gender, phone_number, price, 'process']
+      [user_id, description, date, gender, user.phone_number, price, 'process']
     );
+    
     res.status(201).json({ message: 'Notice posted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to post notice', details: error.message });
