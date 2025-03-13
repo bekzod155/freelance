@@ -110,7 +110,6 @@ const Login = () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem("token", result.token);
-        console.log("Token stored:", localStorage.getItem("token"));
         showToast("Kirish muvaffaqiyatli!");
         setTimeout(() => {
           navigate("/notice");
@@ -169,6 +168,8 @@ const Register = () => {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [agreeToPolicy, setAgreeToPolicy] = useState(false);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
   const navigate = useNavigate();
 
@@ -195,7 +196,6 @@ const Register = () => {
       console.log("Registration response:", result); // Debug log
       if (response.ok) {
         localStorage.setItem("token", result.token); // Store the JWT
-        console.log("Token stored:", localStorage.getItem("token")); // Debug log
         showToast("Roʻyhatdan oʻtish muvaffaqiyatli!");
         setName("");
         setPhoneNumber("");
@@ -210,6 +210,14 @@ const Register = () => {
       showToast("Server bilan bogʻlanishda xatolik", "error");
       console.error("Error:", error);
     }
+  };
+
+  const openPolicyModal = () => {
+    setShowPolicyModal(true);
+  };
+
+  const closePolicyModal = () => {
+    setShowPolicyModal(false);
   };
 
   return (
@@ -246,11 +254,109 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100 mb-3">
+
+          <div className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="privacyPolicy"
+              checked={agreeToPolicy}
+              onChange={(e) => setAgreeToPolicy(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="privacyPolicy">
+              Shaxsiy ma'lumotlarni qayta ishlash va foydalanish shartlari
+              <span 
+                className="ms-1 text-primary" 
+                style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                onClick={openPolicyModal}
+              >
+                (Ko'rish)
+              </span>
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            className="btn btn-primary w-100 mb-3"
+            disabled={!agreeToPolicy}
+          >
             Roʻyxattan oʻtish
           </button>
         </form>
       </div>
+
+      {/* Bootstrap Modal for Privacy Policy */}
+      <div className={`modal fade ${showPolicyModal ? 'show' : ''}`} 
+           style={{ display: showPolicyModal ? 'block' : 'none' }} 
+           tabIndex="-1" 
+           role="dialog" 
+           aria-hidden={!showPolicyModal}>
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Shaxsiy ma'lumotlarni qayta ishlash va foydalanish shartlari</h5>
+              <button type="button" className="btn-close" onClick={closePolicyModal}></button>
+            </div>
+            <div className="modal-body" style={{ maxHeight: "300px", overflowY: "auto" }}>
+              <b>Biz siz taqdim etgan ma'lumotlardan quyidagicha foydalanamiz:</b>
+              <ul>
+                <li>Xizmatlarimizni taqdim etish</li>
+                <li>Xizmat sifatini yaxshilash</li>
+                <li>Siz bilan aloqa o'rnatish</li>
+                <li>Hisobingizni yaratish</li>
+                <li>Qonunchilikka muvofiq majburiyatlarimizni bajarish</li>
+              </ul>
+              <b>Ma’lumotlarni Himoya Qilish</b>
+              <ul>
+              <li>Ma’lumotlar shifrlanadi va xavfsiz serverlarda saqlanadi.</li>
+              <li>Ma’lumotlar faqat kerakli muddat davomida saqlanadi (masalan, hisob faol bo‘lgan davrda).</li>
+              </ul>
+              <b>Ma’lumotlarni Uchinchi Tomonlarga Berish</b>
+              <ul>
+              <li>Ma’lumotlar to‘lov protsessorlari yoki bulutli xosting provayderlari kabi xizmat ko‘rsatuvchilar bilan baham ko‘rilishi mumkin.</li>
+              <li>Agar qonun talab qilsa, ma’lumotlar huquqni muhofaza qiluvchi organlarga beriladi.</li>
+              <li>Ma’lumotlar uchinchi shaxslarga sotilmaydi yoki ijaraga berilmaydi.</li>
+              </ul>
+              <b>Foydalanish Shartlari:</b>
+              <br />
+              <b>Hisob Yaratish</b>
+              <ul>
+                <li>Ro‘yxatdan o‘tishda haqiqiy ma’lumotlar taqdim etilishi shart.</li>
+                <li>Hisob ma’lumotlari (parollar) xavfsizligi uchun javobgarsiz.</li>
+                <li>Platforma shartlarni buzish holatlarida hisobni to‘xtatib qo‘yishi mumkin.</li>
+              </ul>
+              <b>Taqiqlangan harakatlar</b>
+              <ul>
+                <li>Noqonuniy faoliyat, firibgarlik.</li>
+                <li>Haqoratli yoki tahdidli xatti-harakatlar.</li>
+              </ul>
+              <b>Javobgarlikni Cheklash</b>
+              <ul>
+                <li>Platforma xizmatlarning uzluksiz yoki xatosiz ishlashini kafolatlamaydi.</li>
+                <li>Foydalanuvchilar o‘z harakatlari uchun javobgar.</li>
+              </ul>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={closePolicyModal}>Yopish</button>
+              <button 
+                type="button" 
+                className="btn btn-primary" 
+                onClick={() => {
+                  setAgreeToPolicy(true);
+                  closePolicyModal();
+                }}
+              >
+                Qabul qilaman
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Modal Backdrop */}
+      {showPolicyModal && (
+        <div className="modal-backdrop fade show"></div>
+      )}
+
       <ToastContainer>
         <Toast 
           message={toast.message} 

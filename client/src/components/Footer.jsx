@@ -14,7 +14,7 @@ const Footer = () => {
             <h5 className="">Bogʻlanish</h5>
             <ul className="list-unstyled">
               <li>Email: info@urganchshahar.uz</li>
-              <li>Phone: +1 234 567 890</li>
+              <li>Telefon: +998 91 860 86 16</li>
             </ul>
           </div>
         </div>

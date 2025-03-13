@@ -217,7 +217,6 @@ app.delete('/notice/:id', authenticateToken, async (req, res) => {
 });
 // Get Available Notices (in process) - Public Access
 app.get('/worker', async (req, res) => {
-  console.log('backendd');
   
   try {
     const db = await connectDB();
@@ -419,7 +418,6 @@ app.get('/stats', adminauthenticateToken, async (req, res) => {
       [-2]
     );
     const userNoticeCount = noticeCount.notice_count - adminNoticeCount.admin_notice_count
-    console.log(adminNoticeCount.admin_notice_count,'hello',noticeCount);
     
     
     const result = {
@@ -439,7 +437,6 @@ app.get('/stats', adminauthenticateToken, async (req, res) => {
 // Post Notice by Admin
 app.post('/noticesaddadmin', adminauthenticateToken, async (req, res) => {
   const { description, date, gender, phone_number, price } = req.body;
-
   if (!description || !date || !gender || !phone_number || !price) {
     return res.status(400).json({ error: 'All fields are required' });
   }
