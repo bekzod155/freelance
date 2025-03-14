@@ -84,11 +84,11 @@ const Workers = () => {
             onChange={(e) => setJobTypeFilter(e.target.value)}
           >
             <option value="all">Barcha ish turlari</option>
-            <option value="fullTime">Yuk tashish</option>
-            <option value="partTime">Tozalash</option>
-            <option value="contract">Dala ishlari</option>  
-            <option value="temporary">Qurilish</option>
-            <option value="freelance">Online</option>
+            <option value="Yuk tashish">Yuk tashish</option>
+            <option value="Tozalash">Tozalash</option>
+            <option value="Dala ishlari">Dala ishlari</option>  
+            <option value="Qurilish">Qurilish</option>
+            <option value="Online">Online</option>
           </select>
         </div>
       </div>
