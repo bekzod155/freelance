@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import { useNavigate } from 'react-router-dom';
-const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 // Notice Component with Toast
 const Notice = ({ fetchNotices }) => {
@@ -15,6 +15,8 @@ const Notice = ({ fetchNotices }) => {
     date: '',
     gender: 'all',
     price: '',
+    location: '',  // Added for location
+    jobType: '',   // Added for job type
   });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -59,6 +61,8 @@ const Notice = ({ fetchNotices }) => {
       date: formData.date,
       gender: formData.gender,
       price: parseFloat(formData.price),
+      location: formData.location,   // Added for location
+      jobType: formData.jobType,     // Added for job type
     };
 
     try {
@@ -78,6 +82,8 @@ const Notice = ({ fetchNotices }) => {
           date: '',
           gender: 'male',
           price: '',
+          location: '',  // Reset location
+          jobType: '',   // Reset job type
         });
         fetchNotices();
         handleClose();
@@ -118,7 +124,7 @@ const Notice = ({ fetchNotices }) => {
         <Modal.Body>
           <form onSubmit={handleSubmit}>
             <div className="row mb-3">
-            <div className="col-md-6">
+              <div className="col-md-6">
                 <label htmlFor="price" className="form-label">Ish haqi</label>
                 <input
                   type="number"
@@ -147,7 +153,7 @@ const Notice = ({ fetchNotices }) => {
               </div>
             </div>
             <div className="row mb-3">
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <label className="form-label">Jins</label><br />
                 <div className="form-check form-check-inline">
                   <input
@@ -188,7 +194,41 @@ const Notice = ({ fetchNotices }) => {
                 </div>
               </div>
 
-            </div>
+  
+                <div className="col-md-4 mb-3">
+                  <label htmlFor="location" className="form-label">Manzil</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="location"
+                    name="location"
+                    value={formData.location || ''}
+                    onChange={handleChange}
+                    placeholder="Manzilni kiriting"
+                    required
+                  />
+                </div>
+                
+                <div className="col-md-4 mb-3">
+                  <label htmlFor="jobType" className="form-label">Ish turi</label>
+                  <select
+                    className="form-select"
+                    id="jobType"
+                    name="jobType"
+                    value={formData.jobType || ''}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="" disabled>Ish turini tanlang</option>
+                    <option value="fullTime">Yuk tashish</option>
+                    <option value="partTime">Tozalash</option>
+                    <option value="contract">Dala ishlari</option>  
+                    <option value="temporary">Qurilish</option>
+                    <option value="freelance">Online</option>
+                  </select>
+                </div>
+              </div>
+
             <div className="col-md-12">
               <label htmlFor="description" className="form-label">Tavsif</label>
               <textarea
@@ -373,6 +413,10 @@ const App = () => {
                 <span>Ish tugash vaqti: <strong> {new Date(notice.date).toLocaleDateString("en-GB")} </strong> </span>
                 <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>
               </div>
+              <div className="d-flex card-footer justify-content-between">
+                <span>Manzil:<strong> {notice.jobType} </strong></span>
+                <span>Ish turi <strong> {notice.location} </strong> </span>
+              </div>             
               <div className="d-flex card-footer justify-content-between">
                 <span>Telefon:<strong> {notice.phone_number} </strong></span>
                 <span>Ish haqi: <strong> {notice.price} </strong> </span>

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { Bar } from 'react-chartjs-2'; // Import Bar component
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; // Import Chart.js components
-const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
-// Register Chart.js components
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+const baseURL = process.env.REACT_APP_BASE_URL;
+console.log(baseURL);
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Helper functions (unchanged)
@@ -37,6 +38,8 @@ const Admin = () => {
         gender: 'all',
         phone_number: '',
         price: '',
+        location: '',  // Added location
+        jobType: '',   // Added jobType
     });
     const [message, setMessage] = useState('');
 
@@ -139,7 +142,9 @@ const Admin = () => {
             date: parsedDate ? parsedDate.toISOString().split('T')[0] : '',
             gender: notice.gender,
             phone_number: notice.phone_number,
-            price: notice.price
+            price: notice.price,
+            location: notice.location,  // Added location
+            jobType: notice.jobType,    // Added jobType
         });
         setShowModal(true);
     };
@@ -168,7 +173,9 @@ const Admin = () => {
                     date: formattedDate,
                     gender: editNotice.gender,
                     phone_number: editNotice.phone_number,
-                    price: editNotice.price
+                    price: editNotice.price,
+                    location: editNotice.location,  // Added location
+                    jobType: editNotice.jobType,    // Added jobType
                 })
             });
 
@@ -211,6 +218,8 @@ const Admin = () => {
             gender: createFormData.gender,
             phone_number: createFormData.phone_number,
             price: parseFloat(createFormData.price),
+            location: createFormData.location,  // Added location
+            jobType: createFormData.jobType,    // Added jobType
         };
 
         try {
@@ -231,6 +240,8 @@ const Admin = () => {
                     gender: 'all',
                     phone_number: '',
                     price: '',
+                    location: '',  // Reset location
+                    jobType: '',   // Reset jobType
                 });
                 fetchData('allnotices');
                 setShowCreateModal(false);
@@ -260,7 +271,7 @@ const Admin = () => {
         fetchData('stats');
     };
 
-    // Bar chart data and options
+    // Bar chart data and options (unchanged)
     const chartData = {
         labels: [
             `Umumiy tashriflar: ${data?.home_visits || 0}`,
@@ -378,7 +389,10 @@ const Admin = () => {
                                     <div className="d-flex card-footer justify-content-between">
                                         <span>Ish haqi: <strong> {notice.price} </strong> so'm</span>
                                         <a href={`tel:${notice.phone_number}`} className="text-decoration-none">Telefon:<strong> {notice.phone_number} </strong></a>
-                                        {/* there should be user_phone_number from the notice */}
+                                    </div>
+                                    <div className="d-flex card-footer justify-content-between">
+                                        <span>Manzil: <strong>{notice.location}</strong></span>
+                                        <span>Ish turi: <strong>{notice.jobType}</strong></span>
                                     </div>
                                     <div className="d-flex card-footer justify-content-between">
                                         <button className='btn btn-danger' onClick={() => handleDelete(notice.id)}>
@@ -402,7 +416,7 @@ const Admin = () => {
                 )}
             </div>
 
-            {/* Edit Modal (unchanged) */}
+            {/* Edit Modal */}
             {editNotice && (
                 <div className={`modal fade ${showModal ? 'show d-block' : ''}`} tabIndex="-1" style={{ backgroundColor: showModal ? 'rgba(0,0,0,0.5)' : 'transparent' }}>
                     <div className="modal-dialog">
@@ -437,6 +451,21 @@ const Admin = () => {
                                         <label htmlFor="price" className="form-label">Ish haqi (so'm)</label>
                                         <input type="number" className="form-control" id="price" name="price" value={editNotice.price} onChange={handleInputChange} required />
                                     </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="location" className="form-label">Manzil</label>
+                                        <input type="text" className="form-control" id="location" name="location" value={editNotice.location} onChange={handleInputChange} required />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="jobType" className="form-label">Ish turi</label>
+                                        <select className="form-select" id="jobType" name="jobType" value={editNotice.jobType} onChange={handleInputChange} required>
+                                        <option value="" disabled>Ish turini tanlang</option>
+                                            <option value="fullTime">Yuk tashish</option>
+                                            <option value="partTime">Tozalash</option>
+                                            <option value="contract">Dala ishlari</option>
+                                            <option value="temporary">Qurilish</option>
+                                            <option value="freelance">Online</option>
+                                        </select>
+                                    </div>
                                 </form>
                             </div>
                             <div className="modal-footer">
@@ -448,7 +477,7 @@ const Admin = () => {
                 </div>
             )}
 
-            {/* Create Notice Modal (unchanged) */}
+            {/* Create Notice Modal */}
             <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>E'lon qo‘shish</Modal.Title>
@@ -536,6 +565,39 @@ const Admin = () => {
                                     step="0.01"
                                     required
                                 />
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <label htmlFor="location" className="form-label">Manzil</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="location"
+                                    name="location"
+                                    value={createFormData.location}
+                                    onChange={handleCreateChange}
+                                    placeholder="Manzilni kiriting"
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <label htmlFor="jobType" className="form-label">Ish turi</label>
+                                <select
+                                    className="form-select"
+                                    id="jobType"
+                                    name="jobType"
+                                    value={createFormData.jobType}
+                                    onChange={handleCreateChange}
+                                    required
+                                >
+                                    <option value="" disabled>Ish turini tanlang</option>
+                                    <option value="fullTime">Yuk tashish</option>
+                                    <option value="partTime">Tozalash</option>
+                                    <option value="contract">Dala ishlari</option>
+                                    <option value="temporary">Qurilish</option>
+                                    <option value="freelance">Online</option>
+                                </select>
                             </div>
                         </div>
                         <div className="col-md-12">

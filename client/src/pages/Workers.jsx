@@ -1,12 +1,13 @@
-import React, { useState, useEffect,useRef } from 'react';
-const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com' ;
+import React, { useState, useEffect, useRef } from 'react';
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 const Workers = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [genderFilter, setGenderFilter] = useState('all');
-  const hasMounted = useRef(false)
+  const [jobTypeFilter, setJobTypeFilter] = useState('all'); // New state for jobType filter
+  const hasMounted = useRef(false);
 
   const fetchNotices = async () => {
     try {
@@ -36,9 +37,11 @@ const Workers = () => {
     }
   }, []); // Runs once on mount
 
+  // Filter notices based on both gender and jobType
   const filteredNotices = notices.filter(notice => {
-    if (genderFilter === 'all') return true;
-    return notice.gender === genderFilter;
+    const genderMatch = genderFilter === 'all' || notice.gender === genderFilter;
+    const jobTypeMatch = jobTypeFilter === 'all' || notice.jobType === jobTypeFilter;
+    return genderMatch && jobTypeMatch;
   });
 
   if (loading) return <div>Loading...</div>;
@@ -46,7 +49,8 @@ const Workers = () => {
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center'>
-      <div className="pt-2">
+      <div id='filter' className="pt-2 w-75 d-flex flex-row align-items-center justify-content-between  gap-2">
+        {/* Gender Filter Buttons */}
         <div className="btn-group" role="group">
           <button
             type="button"
@@ -70,6 +74,23 @@ const Workers = () => {
             Ayollar
           </button>
         </div>
+
+        {/* Job Type Filter Dropdown */}
+        <div className="justify-content-end">
+          
+          <select
+            className="form-select "
+            value={jobTypeFilter}
+            onChange={(e) => setJobTypeFilter(e.target.value)}
+          >
+            <option value="all">Barcha ish turlari</option>
+            <option value="fullTime">To'liq stavka</option>
+            <option value="partTime">Yarim stavka</option>
+            <option value="contract">Shartnoma asosida</option>
+            <option value="temporary">Vaqtinchalik</option>
+            <option value="freelance">Frilanser</option>
+          </select>
+        </div>
       </div>
 
       {filteredNotices.length === 0 ? (
@@ -90,10 +111,14 @@ const Workers = () => {
                 <span>Jins: <strong> {notice.gender === 'male' ? 'Erkak' : notice.gender === 'female' ? 'Ayol' : 'Hamma'}</strong></span>               
               </div>
               <div className="d-flex card-footer justify-content-between">
-                <span>Ish haqi: <strong className='text-success'> {notice.price} </strong></span>
+                <span>Manzil: <strong>{notice.location}</strong></span>
+                <span>Ish turi: <strong>{notice.jobType}</strong></span>
+              </div>
+              <div className="d-flex card-footer justify-content-between">
+              <span>Ish haqi: <strong className='text-success'> {notice.price} </strong></span>
                 <a href={`tel:${notice.phone_number}`} className="text-decoration-none">
                   <button
-                    className="btn btn-primary btn-sm "
+                    className="btn btn-primary btn-sm"
                     onClick={trackCallClick}
                   >
                     <i className="bi bi-telephone-fill me-1"></i>

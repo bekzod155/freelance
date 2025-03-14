@@ -3,16 +3,13 @@ import cors from 'cors';
 import connectDB from './database/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import 'dotenv/config'; // Add this to load .env
-import path from 'path'; // Add this to handle file paths for serving the React build
-import { log } from 'console';
-import { console } from 'inspector';
+import 'dotenv/config';
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6'; // Use environment variable
+const JWT_SECRET = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
 
-// Middleware
 app.use(express.json());
 app.use(cors());
 
@@ -40,6 +37,8 @@ const setupDB = async () => {
       phone_number TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       price REAL NOT NULL,
+      location TEXT NOT NULL,  -- Added location field
+      jobType TEXT NOT NULL,   -- Added jobType field
       status TEXT CHECK(status IN ('process', 'denied', 'completed')) NOT NULL DEFAULT 'process',
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
@@ -50,7 +49,6 @@ const setupDB = async () => {
     );
   `);
 
-  // Initialize statistic counters if they don’t exist
   await db.run(`
     INSERT OR IGNORE INTO statistics (stat_key, count) VALUES 
     ('home_visits', 0),
@@ -73,18 +71,19 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
 const adminauthenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Access denied' });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) return res.status(403).json({ error: 'Invalid token' });
-      if (user.role !== 'admin') {
-          return res.status(403).json({ error: 'Admin access required' });
-      }
-      req.user = user;
-      next();
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    req.user = user;
+    next();
   });
 };
 
@@ -145,25 +144,27 @@ app.post('/login', async (req, res) => {
 
 // Post Notice
 app.post('/notices', authenticateToken, async (req, res) => {
-  const { description, date, gender, price } = req.body;
+  const { description, date, gender, price, location, jobType } = req.body;
   const user_id = req.user.id;
-  if (!description || !date || !gender || !price) {
+  if (!description || !date || !gender || !price || !location || !jobType) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   if (!['male', 'female', 'all'].includes(gender)) {
     return res.status(400).json({ error: 'Invalid gender value' });
   }
+  if (!['Qurilish', 'Online', 'Dala ishlari', 'Tozalash', 'Yuk tashish'].includes(jobType)) {
+    return res.status(400).json({ error: 'Invalid job type value' });
+  }
   try {
     const db = await connectDB();
-    // Get the user's phone number from the database
     const user = await db.get('SELECT phone_number FROM users WHERE id = ?', [user_id]);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
     
     await db.run(
-      'INSERT INTO notices (user_id, description, date, gender, phone_number, price, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [user_id, description, date, gender, user.phone_number, price, 'process']
+      'INSERT INTO notices (user_id, description, date, gender, phone_number, price, location, jobType, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [user_id, description, date, gender, user.phone_number, price, location, jobType, 'process']
     );
     
     res.status(201).json({ message: 'Notice posted successfully' });
@@ -178,7 +179,7 @@ app.get('/notice', authenticateToken, async (req, res) => {
   try {
     const db = await connectDB();
     const notices = await db.all(
-      'SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, n.created_at, n.status, u.name AS user_name FROM notices n JOIN users u ON n.user_id = u.id WHERE n.user_id = ? ORDER BY n.created_at DESC',
+      'SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, n.location, n.jobType, n.created_at, n.status, u.name AS user_name FROM notices n JOIN users u ON n.user_id = u.id WHERE n.user_id = ? ORDER BY n.created_at DESC',
       [user_id]
     );
     res.json(notices);
@@ -186,15 +187,14 @@ app.get('/notice', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch notices', details: error.message });
   }
 });
+
 // DELETE Notice by ID
 app.delete('/notice/:id', authenticateToken, async (req, res) => {
   const noticeId = req.params.id;
-  const user_id = req.user.id; // Get the authenticated user's ID from the JWT token
+  const user_id = req.user.id;
 
   try {
     const db = await connectDB();
-
-    // Check if the notice exists and belongs to the user
     const notice = await db.get('SELECT user_id FROM notices WHERE id = ?', [noticeId]);
     if (!notice) {
       return res.status(404).json({ error: 'Notice not found' });
@@ -203,7 +203,6 @@ app.delete('/notice/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized to delete this notice' });
     }
 
-    // Delete the notice
     const result = await db.run('DELETE FROM notices WHERE id = ?', [noticeId]);
     
     if (result.changes > 0) {
@@ -215,15 +214,15 @@ app.delete('/notice/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete notice', details: error.message });
   }
 });
+
 // Get Available Notices (in process) - Public Access
 app.get('/worker', async (req, res) => {
-  
   try {
     const db = await connectDB();
     await db.run('UPDATE statistics SET count = count + 1 WHERE stat_key = "worker_visits"');
     const notices = await db.all(
       `SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, 
-              n.created_at, n.status, u.name AS user_name 
+              n.location, n.jobType, n.created_at, n.status, u.name AS user_name 
        FROM notices n 
        JOIN users u ON n.user_id = u.id 
        WHERE n.status = 'completed' 
@@ -237,9 +236,9 @@ app.get('/worker', async (req, res) => {
     });
   }
 });
+
 // Admin Login
 app.post('/admin', async (req, res) => {
-  
   const { login, password } = req.body;
   if (!login || !password) {
     return res.status(400).json({ error: 'Login and password are required' });
@@ -264,46 +263,47 @@ app.post('/admin', async (req, res) => {
     res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
+
 // Admin Routes with Authentication
 app.get('/admin/allnotices', adminauthenticateToken, async (req, res) => {
   try {
-      const db = await connectDB();
-      const notices = await db.all(
-          `SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, 
-                  n.created_at, n.status, u.name AS user_name 
-           FROM notices n 
-           JOIN users u ON n.user_id = u.id 
-           WHERE n.status = 'completed' 
-           ORDER BY n.created_at DESC`
-      );
-      res.json(notices);
+    const db = await connectDB();
+    const notices = await db.all(
+      `SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, 
+              n.location, n.jobType, n.created_at, n.status, u.name AS user_name 
+       FROM notices n 
+       JOIN users u ON n.user_id = u.id 
+       WHERE n.status = 'completed' 
+       ORDER BY n.created_at DESC`
+    );
+    res.json(notices);
   } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch notices', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch notices', details: error.message });
   }
 });
 
 app.get('/admin/inprogress', adminauthenticateToken, async (req, res) => {
   try {
-      const db = await connectDB();
-      const notices = await db.all(
-          `SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, 
-                  n.created_at, n.status, u.name AS user_name 
-           FROM notices n 
-           JOIN users u ON n.user_id = u.id 
-           WHERE n.status = 'process' 
-           ORDER BY n.created_at DESC`
-      );
-      res.json(notices);
+    const db = await connectDB();
+    const notices = await db.all(
+      `SELECT n.id, n.description, n.date, n.gender, n.phone_number, n.price, 
+              n.location, n.jobType, n.created_at, n.status, u.name AS user_name 
+       FROM notices n 
+       JOIN users u ON n.user_id = u.id 
+       WHERE n.status = 'process' 
+       ORDER BY n.created_at DESC`
+    );
+    res.json(notices);
   } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch notices', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch notices', details: error.message });
   }
 });
 
 app.get('/admin/statistics', adminauthenticateToken, async (req, res) => {
   try {
-      res.json({ message: 'hello' });
+    res.json({ message: 'hello' });
   } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch statistics', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch statistics', details: error.message });
   }
 });
 
@@ -313,8 +313,6 @@ app.put('/admin/notice/:id/status', adminauthenticateToken, async (req, res) => 
 
   try {
     const db = await connectDB();
-
-    // Check if the notice exists and has status 'process'
     const notice = await db.get('SELECT status FROM notices WHERE id = ?', [noticeId]);
     if (!notice) {
       return res.status(404).json({ error: 'Notice not found' });
@@ -323,7 +321,6 @@ app.put('/admin/notice/:id/status', adminauthenticateToken, async (req, res) => 
       return res.status(400).json({ error: 'Only notices in process can be completed' });
     }
 
-    // Update the status to 'completed'
     const result = await db.run(
       'UPDATE notices SET status = ? WHERE id = ?',
       ['completed', noticeId]
@@ -338,14 +335,13 @@ app.put('/admin/notice/:id/status', adminauthenticateToken, async (req, res) => 
     res.status(500).json({ error: 'Failed to update notice status', details: error.message });
   }
 });
+
 // Delete Notice by ID (Admin Only)
 app.delete('/admin/notice/:id', adminauthenticateToken, async (req, res) => {
   const noticeId = req.params.id;
 
   try {
     const db = await connectDB();
-    
-    // Delete the notice
     const result = await db.run('DELETE FROM notices WHERE id = ?', [noticeId]);
     
     if (result.changes > 0) {
@@ -357,26 +353,30 @@ app.delete('/admin/notice/:id', adminauthenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete notice', details: error.message });
   }
 });
+
 // Update Notice by ID (Admin Only)
 app.put('/admin/notice/:id', adminauthenticateToken, async (req, res) => {
   const noticeId = req.params.id;
-  const { description, date, gender, phone_number, price } = req.body;  
+  const { description, date, gender, phone_number, price, location, jobType } = req.body;
 
-  if (!description || !date || !gender || !phone_number || !price) {
+  if (!description || !date || !gender || !phone_number || !price || !location || !jobType) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
   if (!['male', 'female', 'all'].includes(gender)) {
     return res.status(400).json({ error: 'Invalid gender value' });
   }
+  if (!['Qurilish', 'Online', 'Dala ishlari', 'Tozalash', 'Yuk tashish'].includes(jobType)) {
+    return res.status(400).json({ error: 'Invalid job type value' });
+  }
 
   try {
     const db = await connectDB();
     const result = await db.run(
       `UPDATE notices 
-       SET description = ?, date = ?, gender = ?, phone_number = ?, price = ? 
+       SET description = ?, date = ?, gender = ?, phone_number = ?, price = ?, location = ?, jobType = ?
        WHERE id = ?`,
-      [description, date, gender, phone_number, price, noticeId]
+      [description, date, gender, phone_number, price, location, jobType, noticeId]
     );
 
     if (result.changes === 0) {
@@ -388,7 +388,8 @@ app.put('/admin/notice/:id', adminauthenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to update notice', details: error.message });
   }
 });
-// statistics
+
+// Statistics
 app.get('/home_visits', async (req, res) => {
   try {
     const db = await connectDB();
@@ -398,6 +399,7 @@ app.get('/home_visits', async (req, res) => {
   }
   res.send('Freelancing App Backend Running 🚀');
 });
+
 app.post('/stats/track-call-click', async (req, res) => {
   try {
     const db = await connectDB();
@@ -407,6 +409,7 @@ app.post('/stats/track-call-click', async (req, res) => {
     res.status(500).json({ error: 'Failed to track click', details: error.message });
   }
 });
+
 app.get('/stats', adminauthenticateToken, async (req, res) => {
   try {
     const db = await connectDB();
@@ -417,8 +420,7 @@ app.get('/stats', adminauthenticateToken, async (req, res) => {
       'SELECT COUNT(*) as admin_notice_count FROM notices WHERE user_id = ?',
       [-2]
     );
-    const userNoticeCount = noticeCount.notice_count - adminNoticeCount.admin_notice_count
-    
+    const userNoticeCount = noticeCount.notice_count - adminNoticeCount.admin_notice_count;
     
     const result = {
       home_visits: stats.find(s => s.stat_key === 'home_visits')?.count || 0,
@@ -434,22 +436,26 @@ app.get('/stats', adminauthenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch statistics', details: error.message });
   }
 });
+
 // Post Notice by Admin
 app.post('/noticesaddadmin', adminauthenticateToken, async (req, res) => {
-  const { description, date, gender, phone_number, price } = req.body;
-  if (!description || !date || !gender || !phone_number || !price) {
+  const { description, date, gender, phone_number, price, location, jobType } = req.body;
+  if (!description || !date || !gender || !phone_number || !price || !location || !jobType) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   if (!['male', 'female', 'all'].includes(gender)) {
     return res.status(400).json({ error: 'Invalid gender value' });
+  }
+  if (!['Qurilish', 'Online', 'Dala ishlari', 'Tozalash', 'Yuk tashish'].includes(jobType)) {
+    return res.status(400).json({ error: 'Invalid job type value' });
   }
 
   try {
     const db = await connectDB();
     const adminUserId = -2;
     const result = await db.run(
-      'INSERT INTO notices (user_id, description, date, gender, phone_number, price, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [adminUserId, description, date, gender, phone_number, price, 'completed']
+      'INSERT INTO notices (user_id, description, date, gender, phone_number, price, location, jobType, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [adminUserId, description, date, gender, phone_number, price, location, jobType, 'completed']
     );
 
     res.status(201).json({ message: 'Notice posted successfully by admin', noticeId: result.lastID });
@@ -458,13 +464,9 @@ app.post('/noticesaddadmin', adminauthenticateToken, async (req, res) => {
   }
 });
 
-
-// Serve React Build (New Code Added Here)
-// Set the path to the React build folder (adjust path as needed based on your project structure)
+// Serve React Build
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, '../client/build')));
-
-// Handle all other routes by serving the React app (for client-side routing)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });

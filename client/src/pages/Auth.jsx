@@ -2,7 +2,8 @@ import { Route, Routes, Link, useLocation, useNavigate } from "react-router-dom"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-const baseURL = 'https://backendfreelance-01e7cdd05a6d.herokuapp.com';
+const baseURL = process.env.REACT_APP_BASE_URL;
+console.log(baseURL);
 
 const Auth = () => {
   const location = useLocation();
@@ -118,6 +119,7 @@ const Login = () => {
         showToast(result.error || "Xatolik yuz berdi", "error");
       }
     } catch (error) {
+      console.log(baseURL);
       showToast("Server bilan bogʻlanishda xatolik", "error");
     }
   };
